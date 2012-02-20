@@ -1,19 +1,27 @@
 <%
 	controller2param = {
-		"WikiController#edit" => {
+		"WikiController" => {
 			:url2preview => proc{url_for(:controller => 'wiki', :action => 'preview', :project_id => @project, :id => @page.title)},
 			:form_id2serialize => "wiki_form",
 			:id2auto_preview_field => "content_text",
+			:decision => proc {
+				if context[:controller].action_name == "edit" ||
+					(context[:controller].action_name == "show" && @page.new_record?)
+					return true
+				end
+				return false
+			}
 		},
 	}
 
 
-	key = "#{context[:controller].class.name}##{context[:controller].action_name}"
+	key = "#{context[:controller].class.name}"
 	param = controller2param[key]
+
 	auto_preview_duration = Setting.plugin_redmine_wiki_preview_ext['preview_duration'].to_f
 %>
 
-<% if !param.nil? %>
+<% if !param.nil? && param[:decision].call %>
 
 <script type="text/javascript">
 <!--
