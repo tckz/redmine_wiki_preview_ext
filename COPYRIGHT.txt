@@ -1,7 +1,6 @@
-Redmine Wiki Astah-macro plugin allows Redmine's wiki to embed
-image of the diagram which is described by astah*
+Redmine wiki preview extension plugin adds features around wiki page preview.
 
-Copyright (C) 2010 tckz<at.tckz@gmail.com>
+Copyright (C) 2012 tckz<at.tckz@gmail.com>
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
