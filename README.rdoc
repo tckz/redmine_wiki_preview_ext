@@ -14,7 +14,7 @@ Redmine wiki preview extension plugin adds features around wiki page preview.
 * Refresh the preview area automatically.
 * This feature is disabled by default. Because there are some plugins make the wiki auto previewable and conflict each other.
 
-https://raw.github.com/tckz/redmine_wiki_preview_ext/master/ss.png
+{<img src="https://raw.github.com/tckz/redmine_wiki_preview_ext/master/ss.png" />}
 
 == Requirement
 
