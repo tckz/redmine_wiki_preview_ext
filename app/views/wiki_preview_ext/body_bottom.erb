@@ -1,0 +1,77 @@
+<%
+	controller2param = {
+		"WikiController#edit" => {
+			:url2preview => proc{url_for(:controller => 'wiki', :action => 'preview', :project_id => @project, :id => @page.title)},
+			:form_id2serialize => "wiki_form",
+			:id2auto_preview_field => "content_text",
+		},
+	}
+
+
+	key = "#{context[:controller].class.name}##{context[:controller].action_name}"
+	param = controller2param[key]
+	auto_preview_duration = Setting.plugin_redmine_wiki_preview_ext['preview_duration'].to_f
+%>
+
+<% if !param.nil? %>
+
+<script type="text/javascript">
+<!--
+Event.observe(document, "dom:loaded", function() {
+	var toolbar = $$("div.jstElements");
+	var preview = $("preview");
+	if (toolbar.length < 1 || !preview) {
+		return;
+	}
+
+	var preview_here = toolbar[0].insert({
+		bottom: new Element("a", {
+				id: "preview-here",
+				href: "#"
+			}).update('<%=j h t :preview_here%>')
+	});
+
+	new Draggable(preview, {scroll: window});
+	preview.setStyle({cursor: "move"});
+
+	var update_preview_area = function() {
+		return new Ajax.Updater("preview", 
+			'<%=j h param[:url2preview].call %>', {
+				asynchronous: true, 
+				evalScripts: true, 
+				method: "post", 
+				onComplete: function(request) {}, 
+				parameters: Form.serialize("<%=j h param[:form_id2serialize] %>") 
+			}
+		);
+	};
+
+	var once_moved = false;
+	preview_here.observe('click', function() {
+		if (!once_moved) {
+			var height = $('preview-here').getHeight();
+			var dstOffset = $('preview-here').cumulativeOffset();
+			var srcOffset = $('preview').cumulativeOffset();
+			var moveOffset = dstOffset.relativeTo(srcOffset);
+			new Effect.Move($('preview'), {
+				x: moveOffset.left,
+				y: moveOffset.top + height,
+				mode: 'relative',
+				duration: 0.5
+			});
+			once_moved = true;
+		}
+
+		update_preview_area();
+		return false;
+	});
+
+	<% if auto_preview_duration > 0 %>
+	new Field.Observer('<%=j h param[:id2auto_preview_field] %>', <%=j h auto_preview_duration %>, function() { update_preview_area(); });
+	<% end %>
+});
+-->
+</script>
+
+<% end %>
+
