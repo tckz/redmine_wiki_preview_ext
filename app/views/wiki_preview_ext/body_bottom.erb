@@ -32,12 +32,12 @@ Event.observe(document, "dom:loaded", function() {
 		return;
 	}
 
-	var preview_here = toolbar[0].insert({
-		bottom: new Element("a", {
-				id: "preview-here",
-				href: "#"
-			}).update('<%=j h t :preview_here%>')
-	});
+	var preview_here = new Element("a", {
+		id: "preview-here",
+		href: "#"
+	}).update('<%=j h t :preview_here%>');
+
+	toolbar[0].insert({bottom: preview_here});
 
 	new Draggable(preview, {scroll: window});
 	preview.setStyle({cursor: "move"});
