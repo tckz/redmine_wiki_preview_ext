@@ -22,7 +22,7 @@ Redmine wiki preview extension plugin adds features around wiki page preview.
 
 == Getting the plugin
 
-A copy of the plugin can be downloaded from http://passing.breeze.cc/mt/redmine_plugin
+https://github.com/tckz/redmine_wiki_preview_ext
 
 Source code:
 git://github.com/tckz/redmine_wiki_preview_ext.git
@@ -37,8 +37,9 @@ git://github.com/tckz/redmine_wiki_preview_ext.git
 2. Restart Redmine.
 3. Login to Redmine as an Administrator 
 4. Setup wiki preview extension plugin settings in the Plugin settings panel.
-    'Duration' : Specify seconds to auto preview duration.
-    If this value is 0, auto preview feature is disabled.
+    'Duration' : 
+      Specify seconds to auto preview duration.
+      If this value is 0, auto preview feature of this plugin is disabled.
     
 == License
 
