@@ -1,10 +1,10 @@
 <%
 	controller2param = {
 		"WikiController" => {
-			:url2preview => proc{url_for(:controller => 'wiki', :action => 'preview', :project_id => @project, :id => @page.title)},
+			:url2preview => lambda {url_for(:controller => 'wiki', :action => 'preview', :project_id => @project, :id => @page.title)},
 			:form_id2serialize => "wiki_form",
 			:id2auto_preview_field => "content_text",
-			:decision => proc {
+			:decision => lambda {
 				if context[:controller].action_name == "edit" ||
 					(context[:controller].action_name == "show" && @page.new_record?)
 					return true
