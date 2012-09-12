@@ -25,57 +25,77 @@
 
 <script type="text/javascript">
 <!--
-Event.observe(document, "dom:loaded", function() {
-	var toolbar = $$("div.jstElements");
-	var preview = $("preview");
-	if (toolbar.length < 1 || !preview) {
+$(document).ready(function() {
+	var toolbar = $("div.jstElements");
+	var preview = $("#preview");
+	if (toolbar.length < 1 || preview.length < 1) {
 		return;
 	}
 
-	var preview_here = new Element("a", {
-		id: "preview-here",
-		href: "#"
-	}).update('<%=j h t :preview_here%>');
+	var preview_here = $("<a/>")
+		.attr({
+			id: "preview-here",
+			href: "#"
+		})
+		.text('<%=j h t :preview_here%>');
 
-	toolbar[0].insert({bottom: preview_here});
+	toolbar.append(preview_here);
 
-	new Draggable(preview, {scroll: window});
-	preview.setStyle({cursor: "move"});
+	preview.css({
+		cursor: "move",
+	});
+		
+	preview.draggable({
+		cursor: "move",
+		opacity: 0.8
+	});
 
 	var update_preview_area = function() {
-		return new Ajax.Updater("preview", 
-			'<%=j h param[:url2preview].call %>', {
-				asynchronous: true, 
-				evalScripts: true, 
-				method: "post", 
-				onComplete: function(request) {}, 
-				parameters: Form.serialize("<%=j h param[:form_id2serialize] %>") 
-			}
+		submitPreview(
+			'<%=j h param[:url2preview].call %>', 
+			'<%=j h param[:form_id2serialize] %>',
+			"preview"
 		);
 	};
 
 	var once_moved = false;
-	preview_here.observe('click', function() {
+	preview_here.on('click', function() {
 		if (!once_moved) {
-			var height = $('preview-here').getHeight();
-			var dstOffset = $('preview-here').cumulativeOffset();
-			var srcOffset = $('preview').cumulativeOffset();
-			var moveOffset = dstOffset.relativeTo(srcOffset);
-			new Effect.Move($('preview'), {
-				x: moveOffset.left,
-				y: moveOffset.top + height,
-				mode: 'relative',
-				duration: 0.5
+			var preview_here_offset = $('#preview-here').offset();
+			var preview_offset = $('#preview').offset();
+			preview.animate({
+				top: "+=" + (preview_here_offset.top - preview_offset.top + preview_here.height()),
+				left: "+=" + (preview_here_offset.left - preview_offset.left),
+				duration: 0.8
 			});
 			once_moved = true;
 		}
-
 		update_preview_area();
+
 		return false;
 	});
 
 	<% if auto_preview_duration > 0 %>
-	new Field.Observer('<%=j h param[:id2auto_preview_field] %>', <%=j h auto_preview_duration %>, function() { update_preview_area(); });
+	var	timer;
+	var prev_val;
+	var field_to_watch = $("#<%=j h param[:id2auto_preview_field] %>");
+	var reset_timer = function(duration) {
+		if (timer != undefined) {
+			clearTimeout(timer);
+		}
+
+		timer = setTimeout(function() {
+			var current_val = field_to_watch.val();
+			if (prev_val != current_val) {
+				update_preview_area();
+				prev_val = current_val;
+			};
+		}, duration);
+	};
+
+	field_to_watch.bind("keyup click mousemove", function() { 
+			reset_timer(<%=j h auto_preview_duration %> * 1000); 
+		});
 	<% end %>
 });
 -->

@@ -18,11 +18,14 @@ Redmine wiki preview extension plugin adds features around wiki page preview.
 
 == Requirement
 
-* Redmine 1.3.0 or later.
+* Redmine 2.1.0 or later.
+* ruby 1.9
 
 == Getting the plugin
 
 https://github.com/tckz/redmine_wiki_preview_ext
+
+A copy of the plugin can be downloaded from http://passing.breeze.cc/mt/redmine_plugin
 
 Source code:
 git://github.com/tckz/redmine_wiki_preview_ext.git
@@ -47,10 +50,10 @@ See COPYRIGHT.txt and GPL.txt for details.
 
 == My environment
 
-* CentOS 6.2 x64
+* CentOS 6.3 x64
 * ruby-1.9.3p194
 * mysql-server-5.1.61
 * graphviz-2.26.0
-* redmine-2.0.3
+* redmine-2.1.0
 
 
