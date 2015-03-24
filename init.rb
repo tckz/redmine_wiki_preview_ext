@@ -5,9 +5,9 @@ Redmine::Plugin.register :redmine_wiki_preview_ext do
 	name 'Wiki preview extension plugin'
 	author 'tckz'
   description 'Expand wiki preview.'
-	version '0.2.0'
-	requires_redmine :version_or_higher => '2.1.0'
-  url "http://passing.breeze.cc/mt/" if respond_to?(:url)
+	version '0.3.0'
+	requires_redmine :version_or_higher => '3.0.0'
+  url "http://passing.breeze.cc/mt/"
 	settings :default => {
 			"preview_duration" => "0",
 		}, :partial => 'wiki_preview_ext/settings'

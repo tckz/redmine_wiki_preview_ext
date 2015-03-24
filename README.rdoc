@@ -18,8 +18,8 @@ Redmine wiki preview extension plugin adds features around wiki page preview.
 
 == Requirement
 
-* Redmine 2.1.0 or later.
-* ruby 1.9
+* Redmine 3.0.0 or later.
+* ruby 2.2
 
 == Getting the plugin
 

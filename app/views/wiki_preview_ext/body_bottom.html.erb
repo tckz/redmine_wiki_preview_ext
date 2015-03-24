@@ -3,10 +3,28 @@
 		"WikiController" => {
 			:url2preview => lambda {url_for(:controller => 'wiki', :action => 'preview', :project_id => @project, :id => @page.title)},
 			:form_id2serialize => "wiki_form",
-			:id2auto_preview_field => "content_text",
-			:decision => lambda {
+			:selector2auto_preview_field => "#content_text",
+			:attach_required => lambda {
 				if context[:controller].action_name == "edit" ||
 					(context[:controller].action_name == "show" && @page.new_record?)
+					return true
+				end
+				return false
+			}
+		},
+		"IssuesController" => {
+			:url2preview => lambda {
+				if context[:controller].action_name == "new"
+					preview_new_issue_path(:project_id => @issue.project)
+				else
+					preview_edit_issue_path(:project_id => @project, :id => @issue)
+				end
+			},
+			:form_id2serialize => "issue-form",
+			:selector2auto_preview_field => "#issue_description,#issue_notes",
+			:attach_required => lambda {
+				if context[:controller].action_name == "show" ||
+					context[:controller].action_name == "new"
 					return true
 				end
 				return false
@@ -21,25 +39,45 @@
 	auto_preview_duration = Setting.plugin_redmine_wiki_preview_ext['preview_duration'].to_f
 %>
 
-<% if !param.nil? && param[:decision].call %>
+<% if !param.nil? && param[:attach_required].call %>
 
 <script type="text/javascript">
 <!--
-$(document).ready(function() {
+jQuery(function($) {
+	"use strict";
+
 	var toolbar = $("div.jstElements");
 	var preview = $("#preview");
 	if (toolbar.length < 1 || preview.length < 1) {
 		return;
 	}
 
-	var preview_here = $("<a/>")
-		.attr({
-			id: "preview-here",
-			href: "#"
-		})
-		.text('<%=j h t :preview_here%>');
+	var previewHereCount = 0;
+	toolbar.each(function() {
+		var preview_here = $("<a/>")
+			.attr({
+				id: "preview-here" + previewHereCount,
+				href: "#"
+			})
+			.text('<%=j t :preview_here%>');
 
-	toolbar.append(preview_here);
+		preview_here.on('click', function() {
+
+			var preview_here_offset = preview_here.offset();
+			var preview_offset = $('#preview').offset();
+			preview.animate({
+				top: "+=" + (preview_here_offset.top - preview_offset.top + preview_here.height()),
+				left: "+=" + (preview_here_offset.left - preview_offset.left),
+				duration: 0.8
+			});
+			update_preview_area();
+
+			return false;
+		});
+	
+		$(this).append(preview_here);
+		previewHereCount++;
+	});
 
 	preview.css({
 		cursor: "move",
@@ -52,53 +90,39 @@ $(document).ready(function() {
 
 	var update_preview_area = function() {
 		submitPreview(
-			'<%=j h param[:url2preview].call %>', 
-			'<%=j h param[:form_id2serialize] %>',
+			'<%=j param[:url2preview].call %>', 
+			'<%=j param[:form_id2serialize] %>',
 			"preview"
 		);
 	};
 
-	var once_moved = false;
-	preview_here.on('click', function() {
-		if (!once_moved) {
-			var preview_here_offset = $('#preview-here').offset();
-			var preview_offset = $('#preview').offset();
-			preview.animate({
-				top: "+=" + (preview_here_offset.top - preview_offset.top + preview_here.height()),
-				left: "+=" + (preview_here_offset.left - preview_offset.left),
-				duration: 0.8
-			});
-			once_moved = true;
-		}
-		update_preview_area();
-
-		return false;
-	});
 
 	<% if auto_preview_duration > 0 %>
-	var	timer;
-	var prev_val;
-	var field_to_watch = $("#<%=j h param[:id2auto_preview_field] %>");
-	var reset_timer = function(duration) {
-		if (timer != undefined) {
-			clearTimeout(timer);
-		}
+	$("<%=j param[:selector2auto_preview_field] %>").each(function() {
+		var field_to_watch = $(this);
+		var	timer;
+		var prev_val;
+		var reset_timer = function(duration) {
+			if (timer != undefined) {
+				clearTimeout(timer);
+			}
 
-		timer = setTimeout(function() {
-			var current_val = field_to_watch.val();
-			if (prev_val != current_val) {
-				update_preview_area();
-				prev_val = current_val;
-			};
-		}, duration);
-	};
+			timer = setTimeout(function() {
+				var current_val = field_to_watch.val();
+				if (prev_val != current_val) {
+					update_preview_area();
+					prev_val = current_val;
+				};
+			}, duration);
+		};
 
-	field_to_watch.bind("keyup click mousemove", function() { 
-			reset_timer(<%=j h auto_preview_duration %> * 1000); 
+		field_to_watch.on("keyup click mousemove", function() { 
+			reset_timer(<%=j auto_preview_duration.to_s %> * 1000); 
 		});
+	});
 	<% end %>
 });
--->
+// -->
 </script>
 
 <% end %>
