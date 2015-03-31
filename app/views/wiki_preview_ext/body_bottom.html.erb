@@ -46,17 +46,38 @@
 jQuery(function($) {
 	"use strict";
 
-	var toolbar = $("div.jstElements");
 	var preview = $("#preview");
-	if (toolbar.length < 1 || preview.length < 1) {
+	if (preview.length == 0) {
 		return;
 	}
 
+	function applyPreviewHere() {
+		$("div.jstElements").each(function() {
+			addPreviewHere(this);
+		});
+	}
+	applyPreviewHere();
+
+	var old_replaceIssueFormWith = window.replaceIssueFormWith;
+	if (old_replaceIssueFormWith) {
+		window.replaceIssueFormWith = function() {
+			old_replaceIssueFormWith.apply(this, arguments);
+			applyPreviewHere();
+		};
+	}
+
 	var previewHereCount = 0;
-	toolbar.each(function() {
+	function addPreviewHere(toolbar) {
+
+		var previous = $(toolbar).find(".preview-here");
+		if (previous.length > 0) {
+			return ;
+		}
+
 		var preview_here = $("<a/>")
 			.attr({
 				id: "preview-here" + previewHereCount,
+				"class": "preview-here",
 				href: "#"
 			})
 			.text('<%=j t :preview_here%>');
@@ -75,9 +96,9 @@ jQuery(function($) {
 			return false;
 		});
 	
-		$(this).append(preview_here);
+		$(toolbar).append(preview_here);
 		previewHereCount++;
-	});
+	}
 
 	preview.css({
 		cursor: "move",
